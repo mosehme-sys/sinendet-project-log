@@ -46,7 +46,7 @@
 
   /* ---------- Sidebar ---------- */
   #sidebar{
-    width:270px;
+    width:300px;
     flex-shrink:0;
     background:linear-gradient(180deg, var(--board) 0%, #1C2536 100%);
     color:var(--paper);
@@ -70,23 +70,29 @@
   #sidebar .brand .motto{font-size:0.72rem; font-style:italic; color:var(--yellow); margin:0 0 8px;}
   #sidebar .brand p{margin:0; font-size:0.74rem; color:#AEBBC2; line-height:1.45;}
 
-  #subject-list{flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:3px; padding-right:2px;}
+  #subject-list{flex:1; overflow-y:auto; display:grid; grid-template-columns:1fr 1fr; gap:8px; padding-right:2px; align-content:start;}
   .sidebar-section-label{
+    grid-column:1 / -1;
     font-size:0.66rem; font-weight:600; text-transform:uppercase; letter-spacing:0.09em;
-    color:#7C8A96; padding:14px 10px 4px; opacity:0.85;
+    color:#7C8A96; padding:14px 2px 2px; opacity:0.85;
   }
   .sidebar-section-label:first-child{padding-top:2px;}
   .subject-btn{
-    display:flex; align-items:center; gap:10px; width:100%; text-align:left;
-    background:transparent; border:none; color:#D9E2DC;
-    font-size:0.9rem; padding:10px 10px; border-radius:8px; cursor:pointer;
-    transition:background 0.15s ease;
+    display:grid; grid-template-columns:1fr auto; grid-template-areas:"dot count" "name name";
+    align-items:center; row-gap:8px; width:100%; text-align:left;
+    background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07); color:#D9E2DC;
+    font-size:0.82rem; line-height:1.25; padding:12px 10px; border-radius:10px; cursor:pointer;
+    min-height:74px; transition:background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
   }
-  .subject-btn:hover{background:var(--board-light);}
-  .subject-btn.active{background:var(--board-light); color:var(--yellow); font-weight:600; box-shadow:inset 3px 0 0 var(--yellow);}
-  .dot{width:9px; height:9px; border-radius:50%; flex-shrink:0;}
-  .subject-btn .count{margin-left:auto; font-size:0.7rem; background:rgba(244,240,230,0.12); padding:2px 7px; border-radius:999px; color:#CBD5CC;}
+  .subject-btn:hover{background:var(--board-light); transform:translateY(-1px);}
+  .subject-btn.active{
+    background:var(--board-light); color:var(--yellow); font-weight:600;
+    border-color:var(--yellow); box-shadow:0 0 0 1px rgba(232,195,76,0.25);
+  }
+  .dot{grid-area:dot; justify-self:start; width:9px; height:9px; border-radius:50%; flex-shrink:0;}
+  .subject-btn .count{grid-area:count; justify-self:end; font-size:0.68rem; background:rgba(244,240,230,0.12); padding:2px 7px; border-radius:999px; color:#CBD5CC;}
   .subject-btn.active .count{background:rgba(232,195,76,0.2); color:var(--yellow);}
+  .subject-btn .subject-name{grid-area:name; align-self:start;}
 
   #admin-box{
     border-top:1px solid var(--board-line);
@@ -230,9 +236,13 @@
     body{flex-direction:column;}
     #sidebar{width:100%; height:auto; position:relative; flex-direction:row; overflow-x:auto; padding:12px 14px; align-items:center; gap:10px;}
     #sidebar .brand{display:none;}
-    #subject-list{flex-direction:row; flex:0 0 auto;}
+    #subject-list{display:flex; flex-direction:row; flex:0 0 auto;}
     .sidebar-section-label{display:none;}
-    .subject-btn{flex-shrink:0; width:auto;}
+    .subject-btn{
+      display:flex; flex-direction:row; align-items:center; gap:8px;
+      flex-shrink:0; width:auto; min-height:auto; padding:9px 12px;
+    }
+    .subject-btn .count{margin-left:2px;}
     #admin-box{
       border-top:none; margin-top:0; padding:0; flex-shrink:0;
       display:flex; align-items:center; margin-left:auto; padding-left:10px;
@@ -442,7 +452,7 @@ async function renderSidebar(){
     const count = await fetchCount(subj.id);
     const btn = document.createElement('button');
     btn.className = 'subject-btn' + (subj.id===currentSubject ? ' active' : '');
-    btn.innerHTML = `<span class="dot" style="background:var(--${subj.tag})"></span>${subj.name}<span class="count">${count}</span>`;
+    btn.innerHTML = `<span class="dot" style="background:var(--${subj.tag})"></span><span class="count">${count}</span><span class="subject-name">${subj.name}</span>`;
     btn.onclick = ()=> switchSubject(subj.id);
     list.appendChild(btn);
   }

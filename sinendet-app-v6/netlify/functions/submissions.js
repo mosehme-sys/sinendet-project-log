@@ -32,7 +32,16 @@ function json(statusCode, obj) {
 
 function normalizeMembers(members) {
   if (!Array.isArray(members)) return [];
-  return members.map((m) => String(m || '').trim().slice(0, 120)).filter((m) => m !== '');
+  return members
+    .map((m) =>
+      typeof m === 'string'
+        ? { name: m.trim().slice(0, 120), assessmentNo: '' }
+        : {
+            name: String((m && m.name) || '').trim().slice(0, 120),
+            assessmentNo: String((m && m.assessmentNo) || '').trim().slice(0, 60),
+          }
+    )
+    .filter((m) => m.name !== '');
 }
 
 function normalizeTasks(tasks) {

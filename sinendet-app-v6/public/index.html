@@ -70,33 +70,10 @@
   #sidebar .brand .motto{font-size:0.72rem; font-style:italic; color:var(--yellow); margin:0 0 8px;}
   #sidebar .brand p{margin:0; font-size:0.74rem; color:#AEBBC2; line-height:1.45;}
 
-  #subject-list{flex:1; overflow-y:auto; display:grid; grid-template-columns:1fr 1fr; gap:8px; padding-right:2px; align-content:start;}
-  .sidebar-section-label{
-    grid-column:1 / -1;
-    font-size:0.66rem; font-weight:600; text-transform:uppercase; letter-spacing:0.09em;
-    color:#7C8A96; padding:14px 2px 2px; opacity:0.85;
-  }
-  .sidebar-section-label:first-child{padding-top:2px;}
-  .subject-btn{
-    display:grid; grid-template-columns:1fr auto; grid-template-areas:"dot count" "name name";
-    align-items:center; row-gap:8px; width:100%; text-align:left;
-    background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07); color:#D9E2DC;
-    font-size:0.82rem; line-height:1.25; padding:12px 10px; border-radius:10px; cursor:pointer;
-    min-height:74px; transition:background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
-  }
-  .subject-btn:hover{background:var(--board-light); transform:translateY(-1px);}
-  .subject-btn.active{
-    background:var(--board-light); color:var(--yellow); font-weight:600;
-    border-color:var(--yellow); box-shadow:0 0 0 1px rgba(232,195,76,0.25);
-  }
-  .dot{grid-area:dot; justify-self:start; width:9px; height:9px; border-radius:50%; flex-shrink:0;}
-  .subject-btn .count{grid-area:count; justify-self:end; font-size:0.68rem; background:rgba(244,240,230,0.12); padding:2px 7px; border-radius:999px; color:#CBD5CC;}
-  .subject-btn.active .count{background:rgba(232,195,76,0.2); color:var(--yellow);}
-  .subject-btn .subject-name{grid-area:name; align-self:start;}
 
   #admin-box{
     border-top:1px solid var(--board-line);
-    margin-top:12px; padding-top:14px; padding-left:6px; padding-right:6px;
+    margin-top:auto; padding-top:14px; padding-left:6px; padding-right:6px;
   }
   #admin-box .admin-status{font-size:0.78rem; color:#B9C7BE; margin-bottom:8px; line-height:1.4;}
   #admin-box .admin-status b{color:var(--yellow);}
@@ -108,6 +85,27 @@
 
   /* ---------- Main ---------- */
   #main{flex:1; padding:34px 40px; max-width:1150px; display:flex; flex-direction:column; min-height:100vh;}
+
+  /* ---------- Home menu of subject tiles ---------- */
+  .home-header{margin-bottom:26px;}
+  .home-header h2{font-size:1.8rem;}
+  .home-header p{margin:6px 0 0; color:var(--ink-soft); font-size:0.95rem;}
+  #home-tile-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(210px,1fr)); gap:16px;}
+  .home-tile{
+    display:flex; flex-direction:column; gap:10px; align-items:flex-start;
+    background:#fff; border:1px solid #E3DCC8; border-radius:var(--radius);
+    padding:20px; cursor:pointer; text-align:left; box-shadow:var(--shadow-sm);
+    transition:box-shadow 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
+  }
+  .home-tile:hover{box-shadow:var(--shadow-md); transform:translateY(-3px); border-color:var(--yellow);}
+  .home-tile .home-tile-dot{width:14px; height:14px; border-radius:50%;}
+  .home-tile .home-tile-name{font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:1.05rem; color:var(--ink);}
+  .home-tile .home-tile-count{font-size:0.8rem; color:var(--ink-soft);}
+  #back-to-home-btn{
+    background:none; border:none; color:var(--ink-soft); font-size:0.88rem; cursor:pointer;
+    padding:0 0 16px; text-decoration:none; font-weight:600;
+  }
+  #back-to-home-btn:hover{color:var(--ink); text-decoration:underline;}
   #site-footer{
     margin-top:auto; padding-top:32px; padding-bottom:8px; text-align:center;
     font-size:0.78rem; color:#9BA69C; display:flex; justify-content:center; gap:8px; flex-wrap:wrap;
@@ -159,6 +157,9 @@
   .remove-row{display:flex; align-items:center; gap:6px; margin-top:8px; font-size:0.78rem; color:var(--ink-soft);}
 
   .tasks-section{margin-bottom:16px; background:var(--paper-dim); border:1px solid #E3DCC8; border-radius:9px; padding:14px 14px 12px;}
+  .worktype-toggle{display:flex; gap:18px; margin-top:4px;}
+  .worktype-option{display:flex; align-items:center; gap:6px; font-size:0.9rem; text-transform:none; font-weight:500; color:var(--ink); cursor:pointer;}
+  .worktype-option input{margin:0;}
   .tasks-label{display:block; font-size:0.76rem; font-weight:600; color:var(--ink-soft); margin-bottom:10px; text-transform:uppercase; letter-spacing:0.03em;}
   .task-row{display:flex; gap:8px; align-items:center; margin-bottom:8px;}
   .task-row input[type=text]{flex:2; min-width:0; padding:8px 10px; border:1px solid #D7CFB6; border-radius:7px; font-family:inherit; font-size:0.88rem; background:#fff;}
@@ -173,6 +174,9 @@
   .total-row{margin-top:10px; font-size:0.88rem; color:var(--ink-soft); border-top:1px dashed #D7CFB6; padding-top:10px;}
   .total-row b{color:var(--ink); font-size:1rem;}
 
+  .type-badge{font-size:0.68rem; font-weight:600; padding:2px 8px; border-radius:999px; background:rgba(127,168,201,0.2); color:#3F6E94; white-space:nowrap;}
+  .members-line{font-size:0.8rem; color:var(--ink-soft); line-height:1.4;}
+  .members-line b{color:var(--ink);}
   .marks-line{font-size:0.82rem; color:var(--ink-soft); background:var(--paper-dim); border-radius:7px; padding:7px 10px; margin-top:-2px;}
   .marks-line b{color:var(--ink);}
   .marks-line .task-chip{display:inline-block; margin-right:8px;}
@@ -234,24 +238,21 @@
 
   @media (max-width: 760px){
     body{flex-direction:column;}
-    #sidebar{width:100%; height:auto; position:relative; flex-direction:row; overflow-x:auto; padding:12px 14px; align-items:center; gap:10px;}
-    #sidebar .brand{display:none;}
-    #subject-list{display:flex; flex-direction:row; flex:0 0 auto;}
-    .sidebar-section-label{display:none;}
-    .subject-btn{
-      display:flex; flex-direction:row; align-items:center; gap:8px;
-      flex-shrink:0; width:auto; min-height:auto; padding:9px 12px;
-    }
-    .subject-btn .count{margin-left:2px;}
+    #sidebar{width:100%; height:auto; position:relative; flex-direction:row; align-items:center; justify-content:space-between; padding:10px 14px; gap:10px;}
+    #sidebar .brand{display:block; padding:0; margin:0; border-bottom:none;}
+    #sidebar .brand .logo-row{margin-bottom:0;}
+    #sidebar .brand .logo-row img{width:36px;}
+    #sidebar .brand h1{font-size:0.82rem;}
+    #sidebar .brand .motto, #sidebar .brand p{display:none;}
     #admin-box{
-      border-top:none; margin-top:0; padding:0; flex-shrink:0;
-      display:flex; align-items:center; margin-left:auto; padding-left:10px;
-      border-left:1px solid var(--board-line);
+      border-top:none; margin-top:0; padding:0; flex-shrink:0; display:flex; align-items:center;
     }
     #admin-box .admin-status{display:none;}
     #admin-box .ghost-btn{width:auto; white-space:nowrap; padding:9px 14px; font-size:0.8rem;}
-    #main{padding:20px;}
+    #main{padding:20px; min-height:auto;}
     #subject-header{align-items:flex-start;}
+    #home-tile-grid{grid-template-columns:repeat(2, 1fr); gap:12px;}
+    .home-tile{padding:16px;}
   }
   @media (max-width: 480px){
     #main{padding:16px 14px;}
@@ -272,7 +273,6 @@
     <p class="motto">Epitome of Excellence</p>
     <p>Project Log — every subject's uploads, shared across every device.</p>
   </div>
-  <div id="subject-list"></div>
   <div id="admin-box">
     <div class="admin-status" id="admin-status">Viewing as guest — anyone can upload projects.</div>
     <button class="ghost-btn" id="admin-toggle-btn">Admin sign in</button>
@@ -280,6 +280,17 @@
 </nav>
 
 <main id="main">
+  <div id="home-view">
+    <div class="home-header">
+      <h2>Choose a subject</h2>
+      <p>Tap a subject to upload a project or browse what's already there.</p>
+    </div>
+    <div id="home-tile-grid"></div>
+  </div>
+
+  <div id="subject-view" style="display:none;">
+    <button type="button" id="back-to-home-btn">← All subjects</button>
+
   <div id="subject-header">
     <div>
       <h2 id="subject-title"></h2>
@@ -306,13 +317,35 @@
       </div>
 
       <div class="field-row">
-        <div class="field">
+        <div class="field" style="flex:1 1 100%;">
+          <label>Who is this for? <span class="required-star">*</span></label>
+          <div class="worktype-toggle">
+            <label class="worktype-option"><input type="radio" name="workType" value="individual" id="workTypeIndividual" checked> Individual student</label>
+            <label class="worktype-option"><input type="radio" name="workType" value="group" id="workTypeGroup"> Group work</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field" id="individual-name-field">
           <label for="studentName">Student name <span class="required-star">*</span></label>
           <input type="text" id="studentName" required placeholder="e.g. Jane Chebet">
+        </div>
+        <div class="field" id="group-name-field" style="display:none;">
+          <label for="groupLabel">Group name (optional)</label>
+          <input type="text" id="groupLabel" placeholder="e.g. Group 1">
         </div>
         <div class="field">
           <label for="assessmentNo">Assessment no. <span class="required-star">*</span></label>
           <input type="text" id="assessmentNo" required placeholder="e.g. CAT-2 or Project 3">
+        </div>
+      </div>
+
+      <div id="group-fields" style="display:none;">
+        <div class="tasks-section">
+          <label class="tasks-label">Group members <span class="required-star">*</span> (at least 2)</label>
+          <div id="members-list"></div>
+          <button type="button" id="add-member-btn" class="link-btn add-task-btn">+ Add a member</button>
         </div>
       </div>
 
@@ -360,6 +393,7 @@
     </div>
     <div id="entries"></div>
     <div id="empty-state" style="display:none;"></div>
+  </div>
   </div>
 
   <footer id="site-footer">
@@ -437,26 +471,36 @@ async function fetchCount(subjectId){
   }catch{ return 0; }
 }
 
-async function renderSidebar(){
-  const list = document.getElementById('subject-list');
-  list.innerHTML = '';
-  let lastGroup = null;
-  for(const subj of SUBJECTS){
-    if(subj.group !== lastGroup){
-      const label = document.createElement('div');
-      label.className = 'sidebar-section-label';
-      label.textContent = subj.group;
-      list.appendChild(label);
-      lastGroup = subj.group;
-    }
-    const count = await fetchCount(subj.id);
-    const btn = document.createElement('button');
-    btn.className = 'subject-btn' + (subj.id===currentSubject ? ' active' : '');
-    btn.innerHTML = `<span class="dot" style="background:var(--${subj.tag})"></span><span class="count">${count}</span><span class="subject-name">${subj.name}</span>`;
-    btn.onclick = ()=> switchSubject(subj.id);
-    list.appendChild(btn);
-  }
+async function renderHomeTiles(){
+  const grid = document.getElementById('home-tile-grid');
+  const counts = await Promise.all(SUBJECTS.map(s => fetchCount(s.id)));
+  grid.innerHTML = '';
+  SUBJECTS.forEach((subj, i)=>{
+    const count = counts[i];
+    const tile = document.createElement('button');
+    tile.type = 'button';
+    tile.className = 'home-tile';
+    tile.innerHTML = `<span class="home-tile-dot" style="background:var(--${subj.tag})"></span>
+      <span class="home-tile-name">${escapeHtml(subj.name)}</span>
+      <span class="home-tile-count">${count} project${count===1?'':'s'}</span>`;
+    tile.onclick = ()=> switchSubject(subj.id);
+    grid.appendChild(tile);
+  });
   renderAdminBox();
+}
+
+function showHomeView(){
+  exitEditMode();
+  document.getElementById('subject-view').style.display = 'none';
+  document.getElementById('home-view').style.display = 'block';
+  renderHomeTiles();
+  window.scrollTo({top:0});
+}
+
+function showSubjectView(){
+  document.getElementById('home-view').style.display = 'none';
+  document.getElementById('subject-view').style.display = 'block';
+  window.scrollTo({top:0});
 }
 
 function renderAdminBox(){
@@ -476,7 +520,7 @@ function switchSubject(id){
   document.getElementById('search').value = '';
   exitEditMode();
   document.getElementById('form-status').textContent = '';
-  renderSidebar();
+  showSubjectView();
   renderHeader();
   renderEntries();
 }
@@ -516,7 +560,7 @@ async function renderEntries(){
 
   const filterVal = document.getElementById('search').value.trim().toLowerCase();
   const filtered = filterVal
-    ? rows.filter(r => r.studentName.toLowerCase().includes(filterVal) || r.assessmentNo.toLowerCase().includes(filterVal))
+    ? rows.filter(r => r.studentName.toLowerCase().includes(filterVal) || r.assessmentNo.toLowerCase().includes(filterVal) || (r.members || []).some(m => m.toLowerCase().includes(filterVal)))
     : rows;
 
   if(filtered.length === 0){
@@ -536,8 +580,16 @@ function buildEntryCard(r){
 
   const top = document.createElement('div');
   top.className = 'entry-top';
-  top.innerHTML = `<h4>${escapeHtml(r.studentName)}</h4>`;
+  const badge = r.workType === 'group' ? '<span class="type-badge group">Group</span>' : '';
+  top.innerHTML = `<h4>${escapeHtml(r.studentName)}</h4>${badge}`;
   card.appendChild(top);
+
+  if(r.workType === 'group' && r.members && r.members.length){
+    const mem = document.createElement('div');
+    mem.className = 'members-line';
+    mem.innerHTML = '<b>Members:</b> ' + r.members.map(escapeHtml).join(', ');
+    card.appendChild(mem);
+  }
 
   const meta = document.createElement('div');
   meta.className = 'entry-meta';
@@ -631,7 +683,6 @@ async function handleDelete(r){
     });
     if(res.status === 401){ handleUnauthorized(); return; }
     if(!res.ok) throw new Error('Delete failed');
-    renderSidebar();
     renderHeader();
     renderEntries();
   }catch(err){
@@ -697,6 +748,54 @@ function escapeAttr(str){
   return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
 }
 
+/* ---------------- Individual vs group work ---------------- */
+
+function addMemberRow(name){
+  const list = document.getElementById('members-list');
+  const row = document.createElement('div');
+  row.className = 'task-row';
+  row.innerHTML = `
+    <input type="text" class="member-name" placeholder="e.g. Learner ${list.children.length + 1}" value="${escapeAttr(name || '')}">
+    <button type="button" class="remove-task-btn" title="Remove member">✕</button>
+  `;
+  row.querySelector('.remove-task-btn').onclick = ()=> row.remove();
+  list.appendChild(row);
+}
+
+function resetMembersSection(){
+  document.getElementById('members-list').innerHTML = '';
+  addMemberRow('');
+  addMemberRow('');
+}
+
+function collectMembers(){
+  const rows = document.querySelectorAll('#members-list .member-name');
+  const members = [];
+  rows.forEach(input=>{
+    const name = input.value.trim();
+    if(name !== '') members.push(name);
+  });
+  return members;
+}
+
+document.getElementById('add-member-btn').onclick = ()=> addMemberRow('');
+
+function getWorkType(){
+  return document.querySelector('input[name="workType"]:checked').value;
+}
+
+function applyWorkTypeUI(){
+  const isGroup = getWorkType() === 'group';
+  document.getElementById('individual-name-field').style.display = isGroup ? 'none' : 'block';
+  document.getElementById('group-name-field').style.display = isGroup ? 'block' : 'none';
+  document.getElementById('group-fields').style.display = isGroup ? 'block' : 'none';
+  document.getElementById('studentName').required = !isGroup;
+}
+
+document.querySelectorAll('input[name="workType"]').forEach(radio=>{
+  radio.addEventListener('change', applyWorkTypeUI);
+});
+
 /* ---------------- Lightbox ---------------- */
 
 function openLightbox(src){
@@ -714,8 +813,21 @@ function enterEditMode(record){
   document.getElementById('form-title').textContent = `Editing ${record.studentName}'s submission`;
   document.getElementById('cancel-edit-btn').style.display = 'inline';
   document.getElementById('submit-btn').textContent = 'Save changes';
-  document.getElementById('studentName').value = record.studentName;
   document.getElementById('assessmentNo').value = record.assessmentNo;
+
+  const isGroup = record.workType === 'group';
+  document.getElementById('workTypeGroup').checked = isGroup;
+  document.getElementById('workTypeIndividual').checked = !isGroup;
+  applyWorkTypeUI();
+
+  if(isGroup){
+    document.getElementById('groupLabel').value = record.studentName || '';
+    document.getElementById('members-list').innerHTML = '';
+    (record.members && record.members.length ? record.members : ['', '']).forEach(m => addMemberRow(m));
+  }else{
+    document.getElementById('studentName').value = record.studentName;
+    resetMembersSection();
+  }
 
   document.getElementById('tasks-list').innerHTML = '';
   if(record.tasks && record.tasks.length){
@@ -744,6 +856,8 @@ function exitEditMode(){
   document.getElementById('submit-btn').textContent = 'Save project';
   document.getElementById('upload-form').reset();
   resetTasksSection();
+  resetMembersSection();
+  applyWorkTypeUI();
   document.getElementById('removePhotosRow').style.display = 'none';
   document.getElementById('removeVideoRow').style.display = 'none';
   document.getElementById('removeAudioRow').style.display = 'none';
@@ -776,16 +890,35 @@ document.getElementById('upload-form').addEventListener('submit', async (e)=>{
   status.className = '';
   status.textContent = '';
 
-  const studentName = document.getElementById('studentName').value.trim();
+  const workType = getWorkType();
   const assessmentNo = document.getElementById('assessmentNo').value.trim();
   const tasks = collectTasks();
   const photoFiles = Array.from(document.getElementById('photos').files);
   const videoFile = document.getElementById('video').files[0] || null;
   const audioFile = document.getElementById('audio').files[0] || null;
 
-  if(!studentName || !assessmentNo){
+  let studentName, members = [];
+  if(workType === 'group'){
+    members = collectMembers();
+    if(members.length < 2){
+      status.className = 'error';
+      status.textContent = 'A group needs at least 2 members — add their names below.';
+      return;
+    }
+    const groupLabel = document.getElementById('groupLabel').value.trim();
+    studentName = groupLabel || `Group (${members.length})`;
+  }else{
+    studentName = document.getElementById('studentName').value.trim();
+    if(!studentName){
+      status.className = 'error';
+      status.textContent = 'Please fill in the student name.';
+      return;
+    }
+  }
+
+  if(!assessmentNo){
     status.className = 'error';
-    status.textContent = 'Please fill in the student name and assessment number.';
+    status.textContent = 'Please fill in the assessment number.';
     return;
   }
 
@@ -820,7 +953,7 @@ document.getElementById('upload-form').addEventListener('submit', async (e)=>{
     submitBtn.textContent = 'Saving…';
 
     if(editingRecord){
-      const payload = { id: editingRecord.id, subject: editingRecord.subject, studentName, assessmentNo, tasks };
+      const payload = { id: editingRecord.id, subject: editingRecord.subject, studentName, assessmentNo, tasks, workType, members };
 
       const removePhotos = document.getElementById('removePhotos').checked;
       const removeVideo = document.getElementById('removeVideo').checked;
@@ -845,7 +978,7 @@ document.getElementById('upload-form').addEventListener('submit', async (e)=>{
       exitEditMode();
     }else{
       const payload = {
-        id: tempId, subject: currentSubject, studentName, assessmentNo, tasks,
+        id: tempId, subject: currentSubject, studentName, assessmentNo, tasks, workType, members,
         photoKeys: newPhotoKeys, videoKey: newVideoKey, audioKey: newAudioKey,
       };
       const res = await fetch(`${API}/submissions`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
@@ -856,7 +989,6 @@ document.getElementById('upload-form').addEventListener('submit', async (e)=>{
       resetTasksSection();
     }
 
-    renderSidebar();
     renderHeader();
     renderEntries();
   }catch(err){
@@ -950,6 +1082,10 @@ function taskSummaryText(r){
   return '';
 }
 
+function membersText(r){
+  return r.workType === 'group' && r.members && r.members.length ? r.members.join(', ') : '';
+}
+
 async function getExportRows(){
   const rows = await loadRows();
   const subj = SUBJECTS.find(s=>s.id===currentSubject);
@@ -964,13 +1100,13 @@ function exportFileBase(subjectName){
 async function exportExcel(){
   await loadScriptOnce('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js');
   const { subjectName, rows } = await getExportRows();
-  const header = ['Student Name', 'Assessment No.', 'Task Breakdown', 'Total Marks', 'Date'];
+  const header = ['Student / Group', 'Type', 'Group Members', 'Assessment No.', 'Task Breakdown', 'Total Marks', 'Date'];
   const data = [header, ...rows.map(r => [
-    r.studentName, r.assessmentNo, taskSummaryText(r),
+    r.studentName, r.workType === 'group' ? 'Group' : 'Individual', membersText(r), r.assessmentNo, taskSummaryText(r),
     r.marks ?? '', new Date(r.createdAt).toLocaleDateString()
   ])];
   const ws = XLSX.utils.aoa_to_sheet(data);
-  ws['!cols'] = [{wch:22},{wch:16},{wch:40},{wch:12},{wch:14}];
+  ws['!cols'] = [{wch:22},{wch:12},{wch:34},{wch:16},{wch:40},{wch:12},{wch:14}];
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, subjectName.slice(0,31));
   XLSX.writeFile(wb, `${exportFileBase(subjectName)}.xlsx`);
@@ -981,6 +1117,8 @@ async function exportWord(){
   const tableRows = rows.map(r => `
     <tr>
       <td>${escapeHtml(r.studentName)}</td>
+      <td>${r.workType === 'group' ? 'Group' : 'Individual'}</td>
+      <td>${escapeHtml(membersText(r))}</td>
       <td>${escapeHtml(r.assessmentNo)}</td>
       <td>${escapeHtml(taskSummaryText(r))}</td>
       <td>${r.marks ?? ''}</td>
@@ -995,7 +1133,7 @@ async function exportWord(){
       <table border="1" cellspacing="0" cellpadding="6" style="border-collapse:collapse; width:100%; font-family:Calibri, Arial, sans-serif; font-size:11pt;">
         <thead>
           <tr style="background:#232E42; color:#fff;">
-            <th>Student Name</th><th>Assessment No.</th><th>Task Breakdown</th><th>Total Marks</th><th>Date</th>
+            <th>Student / Group</th><th>Type</th><th>Group Members</th><th>Assessment No.</th><th>Task Breakdown</th><th>Total Marks</th><th>Date</th>
           </tr>
         </thead>
         <tbody>${tableRows}</tbody>
@@ -1017,21 +1155,21 @@ async function exportPdf(){
   await loadScriptOnce('https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js');
   const { subjectName, rows } = await getExportRows();
   const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
+  const doc = new jsPDF({ orientation: 'landscape' });
   doc.setFontSize(14);
   doc.text(`${subjectName} — Project Log`, 14, 16);
   doc.setFontSize(9);
   doc.text(`Sinendet Mixed Day Senior School — exported ${new Date().toLocaleDateString()}`, 14, 22);
   doc.autoTable({
     startY: 28,
-    head: [['Student Name', 'Assessment No.', 'Task Breakdown', 'Total', 'Date']],
+    head: [['Student / Group', 'Type', 'Members', 'Assess. No.', 'Task Breakdown', 'Total', 'Date']],
     body: rows.map(r => [
-      r.studentName, r.assessmentNo, taskSummaryText(r),
+      r.studentName, r.workType === 'group' ? 'Group' : 'Individual', membersText(r), r.assessmentNo, taskSummaryText(r),
       String(r.marks ?? ''), new Date(r.createdAt).toLocaleDateString()
     ]),
     headStyles: { fillColor: [35, 46, 66] },
     styles: { fontSize: 8, cellWidth: 'wrap' },
-    columnStyles: { 2: { cellWidth: 60 } },
+    columnStyles: { 2: { cellWidth: 40 }, 4: { cellWidth: 45 } },
   });
   doc.save(`${exportFileBase(subjectName)}.pdf`);
 }
@@ -1064,13 +1202,15 @@ exportMenu.querySelectorAll('button').forEach(btn=>{
   };
 });
 
+document.getElementById('back-to-home-btn').onclick = showHomeView;
+
 /* ---------------- Init ---------------- */
 (async function init(){
   document.getElementById('footer-year').textContent = new Date().getFullYear();
   resetTasksSection();
-  await renderSidebar();
-  renderHeader();
-  renderEntries();
+  resetMembersSection();
+  applyWorkTypeUI();
+  await renderHomeTiles();
 })();
 </script>
 </body>

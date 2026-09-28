@@ -163,6 +163,7 @@
   .tasks-label{display:block; font-size:0.76rem; font-weight:600; color:var(--ink-soft); margin-bottom:10px; text-transform:uppercase; letter-spacing:0.03em;}
   .task-row{display:flex; gap:8px; align-items:center; margin-bottom:8px;}
   .task-row input[type=text]{flex:2; min-width:0; padding:8px 10px; border:1px solid #D7CFB6; border-radius:7px; font-family:inherit; font-size:0.88rem; background:#fff;}
+  .task-row input.member-assess{flex:0 0 110px; width:110px;}
   .task-row input[type=number]{flex:0 0 90px; width:90px; padding:8px 10px; border:1px solid #D7CFB6; border-radius:7px; font-family:inherit; font-size:0.88rem; background:#fff;}
   .remove-task-btn{
     flex-shrink:0; background:none; border:none; color:var(--pink); font-size:1.05rem;
@@ -335,7 +336,7 @@
           <label for="groupLabel">Group name (optional)</label>
           <input type="text" id="groupLabel" placeholder="e.g. Group 1">
         </div>
-        <div class="field">
+        <div class="field" id="assessment-field">
           <label for="assessmentNo">Assessment no. <span class="required-star">*</span></label>
           <input type="text" id="assessmentNo" required placeholder="e.g. CAT-2 or Project 3">
         </div>
@@ -343,7 +344,7 @@
 
       <div id="group-fields" style="display:none;">
         <div class="tasks-section">
-          <label class="tasks-label">Group members <span class="required-star">*</span> (at least 2)</label>
+          <label class="tasks-label">Group members <span class="required-star">*</span> (at least 2 — each learner has their own assessment no.)</label>
           <div id="members-list"></div>
           <button type="button" id="add-member-btn" class="link-btn add-task-btn">+ Add a member</button>
         </div>
@@ -560,7 +561,7 @@ async function renderEntries(){
 
   const filterVal = document.getElementById('search').value.trim().toLowerCase();
   const filtered = filterVal
-    ? rows.filter(r => r.studentName.toLowerCase().includes(filterVal) || r.assessmentNo.toLowerCase().includes(filterVal) || (r.members || []).some(m => m.toLowerCase().includes(filterVal)))
+    ? rows.filter(r => r.studentName.toLowerCase().includes(filterVal) || r.assessmentNo.toLowerCase().includes(filterVal) || (r.members || []).some(m => (memberName(m) + ' ' + memberNo(m)).toLowerCase().includes(filterVal)))
     : rows;
 
   if(filtered.length === 0){
@@ -587,13 +588,13 @@ function buildEntryCard(r){
   if(r.workType === 'group' && r.members && r.members.length){
     const mem = document.createElement('div');
     mem.className = 'members-line';
-    mem.innerHTML = '<b>Members:</b> ' + r.members.map(escapeHtml).join(', ');
+    mem.innerHTML = '<b>Members:</b> ' + r.members.map(m => escapeHtml(memberName(m)) + (memberNo(m) ? ` (${escapeHtml(memberNo(m))})` : '')).join(', ');
     card.appendChild(mem);
   }
 
   const meta = document.createElement('div');
   meta.className = 'entry-meta';
-  meta.innerHTML = `<span>Assessment: <b>${escapeHtml(r.assessmentNo)}</b></span>` +
+  meta.innerHTML = (r.workType === 'group' ? '' : `<span>Assessment: <b>${escapeHtml(r.assessmentNo)}</b></span>`) +
     `<span>${new Date(r.createdAt).toLocaleDateString()}</span>`;
   card.appendChild(meta);
 
@@ -750,12 +751,16 @@ function escapeAttr(str){
 
 /* ---------------- Individual vs group work ---------------- */
 
-function addMemberRow(name){
+function memberName(m){ return typeof m === 'string' ? m : (m && m.name) || ''; }
+function memberNo(m){ return typeof m === 'string' ? '' : (m && m.assessmentNo) || ''; }
+
+function addMemberRow(name, assessmentNo){
   const list = document.getElementById('members-list');
   const row = document.createElement('div');
-  row.className = 'task-row';
+  row.className = 'task-row member-row';
   row.innerHTML = `
-    <input type="text" class="member-name" placeholder="e.g. Learner ${list.children.length + 1}" value="${escapeAttr(name || '')}">
+    <input type="text" class="member-name" placeholder="Learner ${list.children.length + 1} name" value="${escapeAttr(name || '')}">
+    <input type="text" class="member-assess" placeholder="Assess. no." value="${escapeAttr(assessmentNo || '')}">
     <button type="button" class="remove-task-btn" title="Remove member">✕</button>
   `;
   row.querySelector('.remove-task-btn').onclick = ()=> row.remove();
@@ -769,11 +774,12 @@ function resetMembersSection(){
 }
 
 function collectMembers(){
-  const rows = document.querySelectorAll('#members-list .member-name');
   const members = [];
-  rows.forEach(input=>{
-    const name = input.value.trim();
-    if(name !== '') members.push(name);
+  document.querySelectorAll('#members-list .member-row').forEach(row=>{
+    const name = row.querySelector('.member-name').value.trim();
+    const assessmentNo = row.querySelector('.member-assess').value.trim();
+    if(name === '' && assessmentNo === '') return; // skip fully empty rows
+    members.push({ name, assessmentNo });
   });
   return members;
 }
@@ -789,7 +795,9 @@ function applyWorkTypeUI(){
   document.getElementById('individual-name-field').style.display = isGroup ? 'none' : 'block';
   document.getElementById('group-name-field').style.display = isGroup ? 'block' : 'none';
   document.getElementById('group-fields').style.display = isGroup ? 'block' : 'none';
+  document.getElementById('assessment-field').style.display = isGroup ? 'none' : 'block';
   document.getElementById('studentName').required = !isGroup;
+  document.getElementById('assessmentNo').required = !isGroup;
 }
 
 document.querySelectorAll('input[name="workType"]').forEach(radio=>{
@@ -813,7 +821,6 @@ function enterEditMode(record){
   document.getElementById('form-title').textContent = `Editing ${record.studentName}'s submission`;
   document.getElementById('cancel-edit-btn').style.display = 'inline';
   document.getElementById('submit-btn').textContent = 'Save changes';
-  document.getElementById('assessmentNo').value = record.assessmentNo;
 
   const isGroup = record.workType === 'group';
   document.getElementById('workTypeGroup').checked = isGroup;
@@ -823,9 +830,10 @@ function enterEditMode(record){
   if(isGroup){
     document.getElementById('groupLabel').value = record.studentName || '';
     document.getElementById('members-list').innerHTML = '';
-    (record.members && record.members.length ? record.members : ['', '']).forEach(m => addMemberRow(m));
+    (record.members && record.members.length ? record.members : ['', '']).forEach(m => addMemberRow(memberName(m), memberNo(m)));
   }else{
     document.getElementById('studentName').value = record.studentName;
+    document.getElementById('assessmentNo').value = record.assessmentNo;
     resetMembersSection();
   }
 
@@ -891,7 +899,7 @@ document.getElementById('upload-form').addEventListener('submit', async (e)=>{
   status.textContent = '';
 
   const workType = getWorkType();
-  const assessmentNo = document.getElementById('assessmentNo').value.trim();
+  let assessmentNo = document.getElementById('assessmentNo').value.trim();
   const tasks = collectTasks();
   const photoFiles = Array.from(document.getElementById('photos').files);
   const videoFile = document.getElementById('video').files[0] || null;
@@ -902,9 +910,15 @@ document.getElementById('upload-form').addEventListener('submit', async (e)=>{
     members = collectMembers();
     if(members.length < 2){
       status.className = 'error';
-      status.textContent = 'A group needs at least 2 members — add their names below.';
+      status.textContent = 'A group needs at least 2 members — add their names and assessment numbers below.';
       return;
     }
+    if(members.some(m => !m.name || !m.assessmentNo)){
+      status.className = 'error';
+      status.textContent = 'Every group member needs both a name and their own assessment number.';
+      return;
+    }
+    assessmentNo = members.map(m => m.assessmentNo).join(', ');
     const groupLabel = document.getElementById('groupLabel').value.trim();
     studentName = groupLabel || `Group (${members.length})`;
   }else{
@@ -1083,7 +1097,11 @@ function taskSummaryText(r){
 }
 
 function membersText(r){
-  return r.workType === 'group' && r.members && r.members.length ? r.members.join(', ') : '';
+  return r.workType === 'group' && r.members && r.members.length ? r.members.map(m => memberName(m) + (memberNo(m) ? ` (${memberNo(m)})` : '')).join(', ') : '';
+}
+
+function assessmentText(r){
+  return r.workType === 'group' ? '(per member)' : r.assessmentNo;
 }
 
 async function getExportRows(){
@@ -1102,7 +1120,7 @@ async function exportExcel(){
   const { subjectName, rows } = await getExportRows();
   const header = ['Student / Group', 'Type', 'Group Members', 'Assessment No.', 'Task Breakdown', 'Total Marks', 'Date'];
   const data = [header, ...rows.map(r => [
-    r.studentName, r.workType === 'group' ? 'Group' : 'Individual', membersText(r), r.assessmentNo, taskSummaryText(r),
+    r.studentName, r.workType === 'group' ? 'Group' : 'Individual', membersText(r), assessmentText(r), taskSummaryText(r),
     r.marks ?? '', new Date(r.createdAt).toLocaleDateString()
   ])];
   const ws = XLSX.utils.aoa_to_sheet(data);
@@ -1119,7 +1137,7 @@ async function exportWord(){
       <td>${escapeHtml(r.studentName)}</td>
       <td>${r.workType === 'group' ? 'Group' : 'Individual'}</td>
       <td>${escapeHtml(membersText(r))}</td>
-      <td>${escapeHtml(r.assessmentNo)}</td>
+      <td>${escapeHtml(assessmentText(r))}</td>
       <td>${escapeHtml(taskSummaryText(r))}</td>
       <td>${r.marks ?? ''}</td>
       <td>${new Date(r.createdAt).toLocaleDateString()}</td>
@@ -1164,7 +1182,7 @@ async function exportPdf(){
     startY: 28,
     head: [['Student / Group', 'Type', 'Members', 'Assess. No.', 'Task Breakdown', 'Total', 'Date']],
     body: rows.map(r => [
-      r.studentName, r.workType === 'group' ? 'Group' : 'Individual', membersText(r), r.assessmentNo, taskSummaryText(r),
+      r.studentName, r.workType === 'group' ? 'Group' : 'Individual', membersText(r), assessmentText(r), taskSummaryText(r),
       String(r.marks ?? ''), new Date(r.createdAt).toLocaleDateString()
     ]),
     headStyles: { fillColor: [35, 46, 66] },

@@ -30,6 +30,11 @@ function json(statusCode, obj) {
   return { statusCode, headers: { ...CORS, 'Content-Type': 'application/json' }, body: JSON.stringify(obj) };
 }
 
+function normalizeMembers(members) {
+  if (!Array.isArray(members)) return [];
+  return members.map((m) => String(m || '').trim().slice(0, 120)).filter((m) => m !== '');
+}
+
 function normalizeTasks(tasks) {
   if (!Array.isArray(tasks)) return [];
   return tasks
@@ -66,7 +71,7 @@ exports.handler = async (event) => {
     // ---- POST: create a new submission (any user, no login needed) ----
     if (event.httpMethod === 'POST') {
       const body = JSON.parse(event.body || '{}');
-      const { id: clientId, subject, studentName, assessmentNo, marks, tasks, photoKeys, videoKey, audioKey } = body;
+      const { id: clientId, subject, studentName, assessmentNo, marks, tasks, workType, members, photoKeys, videoKey, audioKey } = body;
       if (!subject || !studentName || !assessmentNo) {
         return json(400, { error: 'subject, studentName and assessmentNo are required' });
       }
@@ -82,6 +87,8 @@ exports.handler = async (event) => {
         subject,
         studentName,
         assessmentNo,
+        workType: workType === 'group' ? 'group' : 'individual',
+        members: workType === 'group' ? normalizeMembers(members) : [],
         tasks: cleanTasks,
         marks: totalMarks,
         photoKeys: Array.isArray(photoKeys) ? photoKeys : [],
@@ -99,7 +106,7 @@ exports.handler = async (event) => {
         return json(401, { error: 'Admin login required' });
       }
       const body = JSON.parse(event.body || '{}');
-      const { id, subject, studentName, assessmentNo, marks, tasks, photoKeys, videoKey, audioKey } = body;
+      const { id, subject, studentName, assessmentNo, marks, tasks, workType, members, photoKeys, videoKey, audioKey } = body;
       if (!id || !subject) return json(400, { error: 'id and subject are required' });
 
       const key = `${subject}/${id}.json`;
@@ -108,6 +115,11 @@ exports.handler = async (event) => {
 
       if (studentName) existing.studentName = studentName;
       if (assessmentNo) existing.assessmentNo = assessmentNo;
+
+      if (workType === 'group' || workType === 'individual') {
+        existing.workType = workType;
+        existing.members = workType === 'group' ? normalizeMembers(members) : [];
+      }
 
       if (Array.isArray(tasks)) {
         const cleanTasks = normalizeTasks(tasks);

@@ -87,20 +87,57 @@
   #main{flex:1; padding:34px 40px; max-width:1150px; display:flex; flex-direction:column; min-height:100vh;}
 
   /* ---------- Home menu of subject tiles ---------- */
-  .home-header{margin-bottom:26px;}
-  .home-header h2{font-size:1.8rem;}
-  .home-header p{margin:6px 0 0; color:var(--ink-soft); font-size:0.95rem;}
-  #home-tile-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(210px,1fr)); gap:16px;}
-  .home-tile{
-    display:flex; flex-direction:column; gap:10px; align-items:flex-start;
-    background:#fff; border:1px solid #E3DCC8; border-radius:var(--radius);
-    padding:20px; cursor:pointer; text-align:left; box-shadow:var(--shadow-sm);
-    transition:box-shadow 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
+  .home-hero{
+    position:relative; overflow:hidden; display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap;
+    background:linear-gradient(135deg, var(--board) 0%, #34466A 100%); color:var(--paper);
+    border-radius:16px; padding:28px 30px; margin-bottom:30px; box-shadow:var(--shadow-md);
   }
-  .home-tile:hover{box-shadow:var(--shadow-md); transform:translateY(-3px); border-color:var(--yellow);}
-  .home-tile .home-tile-dot{width:14px; height:14px; border-radius:50%;}
-  .home-tile .home-tile-name{font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:1.05rem; color:var(--ink);}
-  .home-tile .home-tile-count{font-size:0.8rem; color:var(--ink-soft);}
+  .home-hero::before, .home-hero::after{
+    content:''; position:absolute; border-radius:50%; background:rgba(232,195,76,0.10); pointer-events:none;
+  }
+  .home-hero::before{width:220px; height:220px; right:-60px; top:-90px;}
+  .home-hero::after{width:140px; height:140px; right:120px; bottom:-80px; background:rgba(127,168,201,0.12);}
+  .hero-text{position:relative; z-index:1; max-width:520px;}
+  .hero-eyebrow{display:inline-block; font-size:0.7rem; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:var(--yellow); margin-bottom:8px;}
+  .home-hero h2{font-size:1.9rem; line-height:1.15;}
+  .home-hero p{margin:8px 0 0; color:#C5D0DA; font-size:0.95rem; line-height:1.5;}
+  .hero-stats{position:relative; z-index:1; display:flex; gap:12px;}
+  .hero-stat{
+    background:rgba(255,255,255,0.09); border:1px solid rgba(255,255,255,0.14); border-radius:12px;
+    padding:12px 20px; text-align:center; min-width:96px;
+  }
+  .hero-stat b{display:block; font-family:'Space Grotesk', sans-serif; font-size:1.6rem; color:var(--yellow);}
+  .hero-stat span{font-size:0.72rem; color:#C5D0DA; letter-spacing:0.05em; text-transform:uppercase;}
+
+  .tile-group{margin-bottom:26px;}
+  .tile-group-label{
+    display:flex; align-items:center; gap:10px; font-size:0.74rem; font-weight:600; text-transform:uppercase;
+    letter-spacing:0.1em; color:var(--ink-soft); margin-bottom:12px;
+  }
+  .tile-group-label::after{content:''; flex:1; height:1px; background:#DDD5BE;}
+  .tile-row{display:grid; grid-template-columns:repeat(auto-fill, minmax(215px,1fr)); gap:16px;}
+  .home-tile{
+    --accent:var(--green-tag);
+    position:relative; display:flex; flex-direction:column; gap:12px; align-items:flex-start; overflow:hidden;
+    background:#fff; border:1px solid #E3DCC8; border-radius:14px;
+    padding:20px 18px 16px; cursor:pointer; text-align:left; box-shadow:var(--shadow-sm);
+    transition:box-shadow 0.18s ease, transform 0.18s ease, border-color 0.18s ease;
+  }
+  .home-tile::before{content:''; position:absolute; left:0; right:0; top:0; height:4px; background:var(--accent);}
+  .home-tile:hover{box-shadow:var(--shadow-md); transform:translateY(-4px); border-color:var(--accent);}
+  .home-tile:active{transform:translateY(-1px);}
+  .home-tile .home-tile-icon{
+    width:46px; height:46px; border-radius:12px; display:flex; align-items:center; justify-content:center;
+    font-size:1.5rem; background:#F1ECDD; box-shadow:inset 0 0 0 1px rgba(0,0,0,0.04);
+  }
+  @supports (background: color-mix(in srgb, red 10%, white)){
+    .home-tile .home-tile-icon{background:color-mix(in srgb, var(--accent) 18%, white);}
+  }
+  .home-tile .home-tile-name{font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:1.06rem; color:var(--ink); line-height:1.2;}
+  .home-tile .home-tile-foot{display:flex; align-items:center; justify-content:space-between; width:100%; margin-top:2px;}
+  .home-tile .home-tile-count{font-size:0.76rem; font-weight:600; color:var(--ink-soft); background:var(--paper-dim); padding:3px 10px; border-radius:999px;}
+  .home-tile .home-tile-arrow{font-size:1.1rem; color:var(--accent); opacity:0; transform:translateX(-6px); transition:all 0.18s ease;}
+  .home-tile:hover .home-tile-arrow{opacity:1; transform:translateX(0);}
   #back-to-home-btn{
     background:none; border:none; color:var(--ink-soft); font-size:0.88rem; cursor:pointer;
     padding:0 0 16px; text-decoration:none; font-weight:600;
@@ -112,7 +149,11 @@
   }
   .footer-dot{opacity:0.6;}
   #subject-header{margin-bottom:22px; display:flex; align-items:flex-end; justify-content:space-between; gap:16px; flex-wrap:wrap;}
-  #subject-header h2{font-size:1.7rem;}
+  #subject-header h2{font-size:1.7rem; display:flex; align-items:center; gap:12px;}
+  .subject-title-icon{
+    width:38px; height:38px; border-radius:11px; display:inline-flex; align-items:center; justify-content:center;
+    font-size:1.15rem; flex-shrink:0; box-shadow:0 2px 6px rgba(0,0,0,0.15);
+  }
   #subject-header p{margin:6px 0 0; color:var(--ink-soft); font-size:0.92rem;}
   #sync-note{font-size:0.78rem; color:var(--motto-green); display:flex; align-items:center; gap:6px;}
   #sync-note .dot-live{width:7px; height:7px; border-radius:50%; background:var(--motto-green); display:inline-block; animation:pulse 2s infinite;}
@@ -199,13 +240,19 @@
   #search{padding:9px 13px; border:1px solid #D7CFB6; border-radius:8px; font-family:inherit; font-size:0.88rem; min-width:230px; background:#fff;}
   #entries{display:grid; grid-template-columns:repeat(auto-fill, minmax(280px,1fr)); gap:16px;}
   .entry-card{
-    background:#fff; border:1px solid #E3DCC8; border-radius:var(--radius); padding:17px;
+    --accent:var(--green-tag);
+    background:#fff; border:1px solid #E3DCC8; border-left:4px solid var(--accent); border-radius:var(--radius); padding:17px;
     display:flex; flex-direction:column; gap:10px; box-shadow:var(--shadow-sm);
     transition:box-shadow 0.15s ease, transform 0.15s ease;
     animation:fadeInUp 0.35s ease both;
   }
   @keyframes fadeInUp{
     from{opacity:0; transform:translateY(8px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+  .view-fade{animation:viewFadeIn 0.28s ease both;}
+  @keyframes viewFadeIn{
+    from{opacity:0; transform:translateY(6px);}
     to{opacity:1; transform:translateY(0);}
   }
   .entry-card:hover{box-shadow:var(--shadow-md); transform:translateY(-2px);}
@@ -221,15 +268,24 @@
   .link-btn{background:none; border:none; font-size:0.78rem; cursor:pointer; padding:2px 0; text-decoration:underline;}
   .edit-btn{color:var(--blue);}
   .delete-btn{color:#B03A2E;}
-  #empty-state{color:var(--ink-soft); font-size:0.9rem; padding:30px 4px; text-align:center; border:1px dashed #D7CFB6; border-radius:var(--radius);}
+  #empty-state{color:var(--ink-soft); font-size:0.9rem; padding:36px 4px; text-align:center; border:1px dashed #D7CFB6; border-radius:var(--radius); line-height:1.6;}
+  #empty-state .empty-icon{font-size:2rem; margin-bottom:6px;}
+  #empty-state .empty-sub{font-size:0.8rem; opacity:0.75; margin-top:2px;}
 
   /* ---------- Lightbox ---------- */
   #lightbox{display:none; position:fixed; inset:0; background:rgba(15,25,20,0.87); align-items:center; justify-content:center; z-index:60; padding:30px;}
+  #lightbox-close{
+    position:absolute; top:20px; right:24px; background:rgba(255,255,255,0.12); border:none; color:#fff;
+    width:38px; height:38px; border-radius:50%; font-size:1.1rem; cursor:pointer; z-index:61;
+    transition:background 0.15s ease;
+  }
+  #lightbox-close:hover{background:rgba(255,255,255,0.22);}
   #lightbox img{max-width:90vw; max-height:90vh; border-radius:8px;}
 
   /* ---------- Admin login modal ---------- */
   #modal-overlay{display:none; position:fixed; inset:0; background:rgba(20,26,20,0.55); align-items:center; justify-content:center; z-index:70; padding:20px;}
   #login-modal{background:#fff; border-radius:14px; padding:28px 26px; width:100%; max-width:340px; box-shadow:0 12px 40px rgba(0,0,0,0.25);}
+  .modal-icon{font-size:1.8rem; margin-bottom:8px;}
   #login-modal h3{font-size:1.15rem; margin-bottom:4px;}
   #login-modal p.sub{font-size:0.8rem; color:var(--ink-soft); margin:0 0 18px;}
   #login-modal .field{margin-bottom:12px;}
@@ -252,8 +308,12 @@
     #admin-box .ghost-btn{width:auto; white-space:nowrap; padding:9px 14px; font-size:0.8rem;}
     #main{padding:20px; min-height:auto;}
     #subject-header{align-items:flex-start;}
-    #home-tile-grid{grid-template-columns:repeat(2, 1fr); gap:12px;}
-    .home-tile{padding:16px;}
+    .tile-row{grid-template-columns:repeat(2, 1fr); gap:12px;}
+    .home-tile{padding:16px 14px 14px;}
+    .home-tile .home-tile-arrow{display:none;}
+    .home-hero{padding:22px 20px; margin-bottom:24px;}
+    .home-hero h2{font-size:1.5rem;}
+    .hero-stat{padding:10px 14px; min-width:80px;}
   }
   @media (max-width: 480px){
     #main{padding:16px 14px;}
@@ -282,10 +342,17 @@
 
 <main id="main">
   <div id="home-view">
-    <div class="home-header">
-      <h2>Choose a subject</h2>
-      <p>Tap a subject to upload a project or browse what's already there.</p>
-    </div>
+    <section class="home-hero">
+      <div class="hero-text">
+        <span class="hero-eyebrow">Project Log</span>
+        <h2>Choose a subject</h2>
+        <p>Tap a subject to upload learners' work or browse what's already there.</p>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat"><b id="stat-subjects">11</b><span>Subjects</span></div>
+        <div class="hero-stat"><b id="stat-projects">–</b><span>Projects</span></div>
+      </div>
+    </section>
     <div id="home-tile-grid"></div>
   </div>
 
@@ -302,9 +369,9 @@
       <div id="export-wrap">
         <button type="button" class="ghost-btn-light" id="export-toggle-btn">Download report ▾</button>
         <div id="export-menu">
-          <button type="button" data-format="excel">Excel (.xlsx)</button>
-          <button type="button" data-format="word">Word (.doc)</button>
-          <button type="button" data-format="pdf">PDF (.pdf)</button>
+          <button type="button" data-format="excel">📊 Excel (.xlsx)</button>
+          <button type="button" data-format="word">📝 Word (.doc)</button>
+          <button type="button" data-format="pdf">📄 PDF (.pdf)</button>
         </div>
       </div>
     </div>
@@ -404,10 +471,11 @@
   </footer>
 </main>
 
-<div id="lightbox"><img id="lightbox-img" src="" alt=""></div>
+<div id="lightbox"><button type="button" id="lightbox-close" aria-label="Close">✕</button><img id="lightbox-img" src="" alt=""></div>
 
 <div id="modal-overlay">
   <div id="login-modal">
+    <div class="modal-icon">🔐</div>
     <h3 id="modal-title">Admin sign in</h3>
     <p class="sub">Sign in to edit or delete submissions. Anyone can still upload without signing in.</p>
     <form id="login-form">
@@ -432,17 +500,17 @@
 const API = '/api';
 
 const SUBJECTS = [
-  {id:'core-maths', name:'Core Mathematics', tag:'yellow', group:'Mathematics'},
-  {id:'chemistry', name:'Chemistry', tag:'green-tag', group:'Sciences'},
-  {id:'physics', name:'Physics', tag:'green-tag', group:'Sciences'},
-  {id:'biology', name:'Biology', tag:'green-tag', group:'Sciences'},
-  {id:'agriculture', name:'Agriculture', tag:'green-tag', group:'Sciences'},
-  {id:'general-science', name:'General Science', tag:'green-tag', group:'Sciences'},
-  {id:'english', name:'English', tag:'blue', group:'Languages'},
-  {id:'kiswahili', name:'Kiswahili', tag:'blue', group:'Languages'},
-  {id:'pe', name:'Physical Education', tag:'pink', group:'Other'},
-  {id:'csl', name:'CSL', tag:'purple-tag', group:'Other'},
-  {id:'ict', name:'ICT', tag:'purple-tag', group:'Other'},
+  {id:'core-maths', icon:'🧮', name:'Core Mathematics', tag:'yellow', group:'Mathematics'},
+  {id:'chemistry', icon:'🧪', name:'Chemistry', tag:'green-tag', group:'Sciences'},
+  {id:'physics', icon:'⚛️', name:'Physics', tag:'green-tag', group:'Sciences'},
+  {id:'biology', icon:'🧬', name:'Biology', tag:'green-tag', group:'Sciences'},
+  {id:'agriculture', icon:'🌱', name:'Agriculture', tag:'green-tag', group:'Sciences'},
+  {id:'general-science', icon:'🔬', name:'General Science', tag:'green-tag', group:'Sciences'},
+  {id:'english', icon:'📖', name:'English', tag:'blue', group:'Languages'},
+  {id:'kiswahili', icon:'🗣️', name:'Kiswahili', tag:'blue', group:'Languages'},
+  {id:'pe', icon:'🏃', name:'Physical Education', tag:'pink', group:'Other'},
+  {id:'csl', icon:'🤝', name:'CSL', tag:'purple-tag', group:'Other'},
+  {id:'ict', icon:'💻', name:'ICT', tag:'purple-tag', group:'Other'},
 ];
 
 const MAX_FILE_BYTES = 300 * 1024 * 1024; // 300MB per file — matches the edge function's safe memory ceiling
@@ -476,16 +544,35 @@ async function renderHomeTiles(){
   const grid = document.getElementById('home-tile-grid');
   const counts = await Promise.all(SUBJECTS.map(s => fetchCount(s.id)));
   grid.innerHTML = '';
+
+  document.getElementById('stat-subjects').textContent = SUBJECTS.length;
+  document.getElementById('stat-projects').textContent = counts.reduce((a, b) => a + b, 0);
+
+  let group = null, row = null;
   SUBJECTS.forEach((subj, i)=>{
+    if(subj.group !== group){
+      group = subj.group;
+      const wrap = document.createElement('div');
+      wrap.className = 'tile-group';
+      wrap.innerHTML = `<div class="tile-group-label">${escapeHtml(group)}</div>`;
+      row = document.createElement('div');
+      row.className = 'tile-row';
+      wrap.appendChild(row);
+      grid.appendChild(wrap);
+    }
     const count = counts[i];
     const tile = document.createElement('button');
     tile.type = 'button';
     tile.className = 'home-tile';
-    tile.innerHTML = `<span class="home-tile-dot" style="background:var(--${subj.tag})"></span>
+    tile.style.setProperty('--accent', `var(--${subj.tag})`);
+    tile.innerHTML = `<span class="home-tile-icon">${subj.icon}</span>
       <span class="home-tile-name">${escapeHtml(subj.name)}</span>
-      <span class="home-tile-count">${count} project${count===1?'':'s'}</span>`;
+      <span class="home-tile-foot">
+        <span class="home-tile-count">${count} project${count===1?'':'s'}</span>
+        <span class="home-tile-arrow">→</span>
+      </span>`;
     tile.onclick = ()=> switchSubject(subj.id);
-    grid.appendChild(tile);
+    row.appendChild(tile);
   });
   renderAdminBox();
 }
@@ -493,14 +580,18 @@ async function renderHomeTiles(){
 function showHomeView(){
   exitEditMode();
   document.getElementById('subject-view').style.display = 'none';
-  document.getElementById('home-view').style.display = 'block';
+  const home = document.getElementById('home-view');
+  home.style.display = 'block';
+  home.classList.remove('view-fade'); void home.offsetWidth; home.classList.add('view-fade');
   renderHomeTiles();
   window.scrollTo({top:0});
 }
 
 function showSubjectView(){
   document.getElementById('home-view').style.display = 'none';
-  document.getElementById('subject-view').style.display = 'block';
+  const view = document.getElementById('subject-view');
+  view.style.display = 'block';
+  view.classList.remove('view-fade'); void view.offsetWidth; view.classList.add('view-fade');
   window.scrollTo({top:0});
 }
 
@@ -528,7 +619,9 @@ function switchSubject(id){
 
 function renderHeader(){
   const subj = SUBJECTS.find(s=>s.id===currentSubject);
-  document.getElementById('subject-title').textContent = subj.name;
+  document.getElementById('subject-title').innerHTML =
+    `<span class="subject-title-icon" style="background:var(--${subj.tag})">${subj.icon}</span>${escapeHtml(subj.name)}`;
+  document.documentElement.style.setProperty('--current-accent', `var(--${subj.tag})`);
   fetchCount(currentSubject).then(count=>{
     document.getElementById('subject-count-text').textContent =
       count === 0 ? 'No projects uploaded yet.' : `${count} project${count===1?'':'s'} on record.`;
@@ -555,7 +648,7 @@ async function renderEntries(){
     cachedRows = rows;
   }catch(err){
     empty.style.display = 'block';
-    empty.textContent = 'Could not reach the server. Check your connection and try again.';
+    empty.innerHTML = '<div class="empty-icon">📡</div><div>Could not reach the server. Check your connection and try again.</div>';
     return;
   }
 
@@ -566,7 +659,9 @@ async function renderEntries(){
 
   if(filtered.length === 0){
     empty.style.display = 'block';
-    empty.textContent = rows.length === 0 ? 'No projects saved yet for this subject.' : 'No matches for that search.';
+    empty.innerHTML = rows.length === 0
+      ? '<div class="empty-icon">🗂️</div><div>No projects saved yet for this subject.</div><div class="empty-sub">Add the first one using the form above.</div>'
+      : '<div class="empty-icon">🔍</div><div>No matches for that search.</div>';
     return;
   }
 
@@ -576,8 +671,10 @@ async function renderEntries(){
 }
 
 function buildEntryCard(r){
+  const subj = SUBJECTS.find(s=>s.id===r.subject);
   const card = document.createElement('div');
   card.className = 'entry-card';
+  if(subj) card.style.setProperty('--accent', `var(--${subj.tag})`);
 
   const top = document.createElement('div');
   top.className = 'entry-top';
@@ -811,6 +908,10 @@ function openLightbox(src){
   document.getElementById('lightbox').style.display = 'flex';
 }
 document.getElementById('lightbox').onclick = ()=>{
+  document.getElementById('lightbox').style.display = 'none';
+};
+document.getElementById('lightbox-close').onclick = (e)=>{
+  e.stopPropagation();
   document.getElementById('lightbox').style.display = 'none';
 };
 
@@ -1115,16 +1216,31 @@ function exportFileBase(subjectName){
   return `${subjectName.replace(/\s+/g,'-')}-projects-${date}`;
 }
 
+function getLogoDataUrl(){
+  const img = document.querySelector('.logo-row img');
+  return img ? img.src : null;
+}
+
 async function exportExcel(){
   await loadScriptOnce('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js');
   const { subjectName, rows } = await getExportRows();
   const header = ['Student / Group', 'Type', 'Group Members', 'Assessment No.', 'Task Breakdown', 'Total Marks', 'Date'];
-  const data = [header, ...rows.map(r => [
-    r.studentName, r.workType === 'group' ? 'Group' : 'Individual', membersText(r), assessmentText(r), taskSummaryText(r),
-    r.marks ?? '', new Date(r.createdAt).toLocaleDateString()
-  ])];
+  const data = [
+    ['Sinendet Mixed Day Senior School'],
+    [`${subjectName} — Project Log (exported ${new Date().toLocaleDateString()})`],
+    [],
+    header,
+    ...rows.map(r => [
+      r.studentName, r.workType === 'group' ? 'Group' : 'Individual', membersText(r), assessmentText(r), taskSummaryText(r),
+      r.marks ?? '', new Date(r.createdAt).toLocaleDateString()
+    ]),
+  ];
   const ws = XLSX.utils.aoa_to_sheet(data);
   ws['!cols'] = [{wch:22},{wch:12},{wch:34},{wch:16},{wch:40},{wch:12},{wch:14}];
+  ws['!merges'] = [
+    { s: { r: 0, c: 0 }, e: { r: 0, c: 6 } },
+    { s: { r: 1, c: 0 }, e: { r: 1, c: 6 } },
+  ];
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, subjectName.slice(0,31));
   XLSX.writeFile(wb, `${exportFileBase(subjectName)}.xlsx`);
@@ -1142,12 +1258,18 @@ async function exportWord(){
       <td>${r.marks ?? ''}</td>
       <td>${new Date(r.createdAt).toLocaleDateString()}</td>
     </tr>`).join('');
+  const logo = getLogoDataUrl();
   const html = `
     <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
     <head><meta charset="utf-8"><title>${escapeHtml(subjectName)} — Project Log</title></head>
     <body>
-      <h2>${escapeHtml(subjectName)} — Project Log</h2>
-      <p>Sinendet Mixed Day Senior School — exported ${new Date().toLocaleDateString()}</p>
+      <table style="width:100%; border:none; margin-bottom:10px;"><tr>
+        ${logo ? `<td style="width:60px; border:none;"><img src="${logo}" width="50" height="50"></td>` : ''}
+        <td style="border:none; vertical-align:middle;">
+          <h2 style="margin:0;">Sinendet Mixed Day Senior School</h2>
+          <p style="margin:2px 0 0;">${escapeHtml(subjectName)} — Project Log — exported ${new Date().toLocaleDateString()}</p>
+        </td>
+      </tr></table>
       <table border="1" cellspacing="0" cellpadding="6" style="border-collapse:collapse; width:100%; font-family:Calibri, Arial, sans-serif; font-size:11pt;">
         <thead>
           <tr style="background:#232E42; color:#fff;">
@@ -1174,12 +1296,19 @@ async function exportPdf(){
   const { subjectName, rows } = await getExportRows();
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ orientation: 'landscape' });
-  doc.setFontSize(14);
-  doc.text(`${subjectName} — Project Log`, 14, 16);
+  const logo = getLogoDataUrl();
+  let textX = 14;
+  if(logo){
+    try{ doc.addImage(logo, 'PNG', 14, 10, 16, 16); textX = 34; }catch(e){ /* fall back to text-only header */ }
+  }
+  doc.setFontSize(13);
+  doc.text('Sinendet Mixed Day Senior School', textX, 17);
   doc.setFontSize(9);
-  doc.text(`Sinendet Mixed Day Senior School — exported ${new Date().toLocaleDateString()}`, 14, 22);
+  doc.setTextColor(90);
+  doc.text(`${subjectName} — Project Log — exported ${new Date().toLocaleDateString()}`, textX, 23);
+  doc.setTextColor(0);
   doc.autoTable({
-    startY: 28,
+    startY: 30,
     head: [['Student / Group', 'Type', 'Members', 'Assess. No.', 'Task Breakdown', 'Total', 'Date']],
     body: rows.map(r => [
       r.studentName, r.workType === 'group' ? 'Group' : 'Individual', membersText(r), assessmentText(r), taskSummaryText(r),

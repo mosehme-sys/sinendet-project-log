@@ -237,6 +237,18 @@
 
   .list-toolbar{display:flex; justify-content:space-between; align-items:center; margin:8px 0 14px; gap:12px; flex-wrap:wrap;}
   .list-toolbar h3{font-size:1.05rem;}
+  .toolbar-right{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .view-toggle{display:flex; border:1px solid #D7CFB6; border-radius:8px; overflow:hidden;}
+  .view-toggle-btn{background:#fff; border:none; padding:8px 14px; font-size:0.82rem; font-family:inherit; cursor:pointer; color:var(--ink-soft);}
+  .view-toggle-btn + .view-toggle-btn{border-left:1px solid #D7CFB6;}
+  .view-toggle-btn.active{background:var(--board); color:var(--yellow); font-weight:600;}
+  #entries.entries-table-mode{display:block;}
+  .summary-table{width:100%; border-collapse:collapse; font-size:0.88rem;}
+  .summary-table th, .summary-table td{padding:10px 12px; text-align:left; border-bottom:1px solid #E3DCC8;}
+  .summary-table th{background:var(--paper-dim); font-size:0.74rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--ink-soft);}
+  .summary-table tbody tr:hover{background:var(--paper-dim);}
+  .summary-table td b{color:var(--ink);}
+  #table-scroll{overflow-x:auto; border:1px solid #E3DCC8; border-radius:var(--radius);}
   #search{padding:9px 13px; border:1px solid #D7CFB6; border-radius:8px; font-family:inherit; font-size:0.88rem; min-width:230px; background:#fff;}
   #entries{display:grid; grid-template-columns:repeat(auto-fill, minmax(280px,1fr)); gap:16px;}
   .entry-card{
@@ -261,8 +273,19 @@
   .entry-meta{font-size:0.8rem; color:var(--ink-soft); display:flex; gap:14px; flex-wrap:wrap;}
   .entry-meta span b{color:var(--ink);}
   .photo-strip{display:flex; gap:6px; overflow-x:auto; padding-bottom:2px;}
-  .photo-strip img{width:76px; height:76px; object-fit:cover; border-radius:7px; flex-shrink:0; border:1px solid #E3DCC8; cursor:zoom-in;}
+  .photo-thumb{position:relative; flex-shrink:0;}
+  .photo-thumb img{width:76px; height:76px; object-fit:cover; border-radius:7px; display:block; border:1px solid #E3DCC8; cursor:zoom-in;}
+  .thumb-download{
+    position:absolute; bottom:3px; right:3px; width:20px; height:20px; border-radius:6px;
+    background:rgba(20,26,20,0.65); color:#fff; display:flex; align-items:center; justify-content:center;
+    font-size:0.7rem; text-decoration:none; opacity:0; transition:opacity 0.15s ease;
+  }
+  .photo-thumb:hover .thumb-download{opacity:1;}
   video, audio{width:100%; border-radius:7px; margin-top:2px;}
+  .media-download-link{
+    display:inline-block; font-size:0.76rem; color:var(--blue); text-decoration:none; font-weight:600; margin-top:-2px;
+  }
+  .media-download-link:hover{text-decoration:underline;}
   .media-label{font-size:0.72rem; font-weight:600; color:var(--ink-soft); letter-spacing:0.02em; margin-top:2px;}
   .entry-actions{display:flex; gap:14px; margin-top:2px;}
   .link-btn{background:none; border:none; font-size:0.78rem; cursor:pointer; padding:2px 0; text-decoration:underline;}
@@ -280,6 +303,13 @@
     transition:background 0.15s ease;
   }
   #lightbox-close:hover{background:rgba(255,255,255,0.22);}
+  #lightbox-download{
+    position:absolute; top:20px; right:70px; background:rgba(255,255,255,0.12); color:#fff;
+    width:38px; height:38px; border-radius:50%; font-size:1rem; cursor:pointer; z-index:61;
+    display:flex; align-items:center; justify-content:center; text-decoration:none;
+    transition:background 0.15s ease;
+  }
+  #lightbox-download:hover{background:rgba(255,255,255,0.22);}
   #lightbox img{max-width:90vw; max-height:90vh; border-radius:8px;}
 
   /* ---------- Admin login modal ---------- */
@@ -428,7 +458,7 @@
         <div class="field file-field">
           <label for="photos">Photos (optional)</label>
           <input type="file" id="photos" accept="image/*" multiple>
-          <small>You can select several images at once.</small>
+          <small>You can select several at once. Large photos are compressed automatically.</small>
           <div class="remove-row" id="removePhotosRow" style="display:none;">
             <input type="checkbox" id="removePhotos"><label for="removePhotos" style="margin:0; text-transform:none;">Remove existing photos</label>
           </div>
@@ -436,7 +466,7 @@
         <div class="field file-field">
           <label for="video">Video (optional)</label>
           <input type="file" id="video" accept="video/*">
-          <small>Up to 300MB.</small>
+          <small>Up to 300MB. Larger clips are compressed automatically where your browser supports it.</small>
           <div class="remove-row" id="removeVideoRow" style="display:none;">
             <input type="checkbox" id="removeVideo"><label for="removeVideo" style="margin:0; text-transform:none;">Remove existing video</label>
           </div>
@@ -457,7 +487,13 @@
 
     <div class="list-toolbar">
       <h3>Submitted projects</h3>
-      <input type="text" id="search" placeholder="Search by student or assessment no.">
+      <div class="toolbar-right">
+        <div class="view-toggle">
+          <button type="button" class="view-toggle-btn active" data-view="cards">Cards</button>
+          <button type="button" class="view-toggle-btn" data-view="table">Table</button>
+        </div>
+        <input type="text" id="search" placeholder="Search by student or assessment no.">
+      </div>
     </div>
     <div id="entries"></div>
     <div id="empty-state" style="display:none;"></div>
@@ -471,7 +507,7 @@
   </footer>
 </main>
 
-<div id="lightbox"><button type="button" id="lightbox-close" aria-label="Close">✕</button><img id="lightbox-img" src="" alt=""></div>
+<div id="lightbox"><button type="button" id="lightbox-close" aria-label="Close">✕</button><a id="lightbox-download" download title="Download photo">⬇</a><img id="lightbox-img" src="" alt=""></div>
 
 <div id="modal-overlay">
   <div id="login-modal">
@@ -636,10 +672,46 @@ async function loadRows(){
   return res.json();
 }
 
+let entriesViewMode = 'cards';
+document.querySelectorAll('.view-toggle-btn').forEach(btn=>{
+  btn.onclick = ()=>{
+    document.querySelectorAll('.view-toggle-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    entriesViewMode = btn.dataset.view;
+    renderEntries();
+  };
+});
+
+function renderEntriesTable(rows){
+  const container = document.getElementById('entries');
+  container.classList.add('entries-table-mode');
+  const wrap = document.createElement('div');
+  wrap.id = 'table-scroll';
+  const table = document.createElement('table');
+  table.className = 'summary-table';
+  table.innerHTML = `
+    <thead><tr>
+      <th>Student / Group</th><th>Type</th><th>Assessment No.</th><th>Total Marks</th><th>Date</th>
+    </tr></thead>
+    <tbody>
+      ${rows.map(r => `
+        <tr>
+          <td>${escapeHtml(r.studentName)}</td>
+          <td>${r.workType === 'group' ? 'Group' : 'Individual'}</td>
+          <td>${escapeHtml(assessmentText(r))}</td>
+          <td><b>${r.marks ?? '—'}</b></td>
+          <td>${new Date(r.createdAt).toLocaleDateString()}</td>
+        </tr>`).join('')}
+    </tbody>`;
+  wrap.appendChild(table);
+  container.appendChild(wrap);
+}
+
 async function renderEntries(){
   const container = document.getElementById('entries');
   const empty = document.getElementById('empty-state');
   container.innerHTML = '';
+  container.classList.remove('entries-table-mode');
   empty.style.display = 'none';
 
   let rows;
@@ -665,8 +737,12 @@ async function renderEntries(){
     return;
   }
 
-  for(const r of filtered){
-    container.appendChild(buildEntryCard(r));
+  if(entriesViewMode === 'table'){
+    renderEntriesTable(filtered);
+  }else{
+    for(const r of filtered){
+      container.appendChild(buildEntryCard(r));
+    }
   }
 }
 
@@ -716,12 +792,24 @@ function buildEntryCard(r){
 
     const strip = document.createElement('div');
     strip.className = 'photo-strip';
-    r.photoKeys.forEach(key=>{
+    r.photoKeys.forEach((key, i)=>{
+      const url = `${API}/media?key=${encodeURIComponent(key)}`;
+      const thumb = document.createElement('div');
+      thumb.className = 'photo-thumb';
       const img = document.createElement('img');
-      img.src = `${API}/media?key=${encodeURIComponent(key)}`;
+      img.src = url;
       img.loading = 'lazy';
-      img.onclick = ()=> openLightbox(img.src);
-      strip.appendChild(img);
+      img.onclick = ()=> openLightbox(url);
+      const dl = document.createElement('a');
+      dl.className = 'thumb-download';
+      dl.href = url;
+      dl.download = `${r.studentName}-photo-${i+1}.jpg`;
+      dl.title = 'Download photo';
+      dl.textContent = '⬇';
+      dl.onclick = (e)=> e.stopPropagation();
+      thumb.appendChild(img);
+      thumb.appendChild(dl);
+      strip.appendChild(thumb);
     });
     card.appendChild(strip);
   }
@@ -734,8 +822,17 @@ function buildEntryCard(r){
 
     const vid = document.createElement('video');
     vid.controls = true;
-    vid.src = `${API}/media?key=${encodeURIComponent(r.videoKey)}`;
+    vid.preload = 'metadata';
+    const videoUrl = `${API}/media?key=${encodeURIComponent(r.videoKey)}`;
+    vid.src = videoUrl;
     card.appendChild(vid);
+
+    const vidDl = document.createElement('a');
+    vidDl.className = 'media-download-link';
+    vidDl.href = videoUrl;
+    vidDl.download = `${r.studentName}-video.mp4`;
+    vidDl.textContent = '⬇ Download video';
+    card.appendChild(vidDl);
   }
 
   if(r.audioKey){
@@ -746,8 +843,16 @@ function buildEntryCard(r){
 
     const aud = document.createElement('audio');
     aud.controls = true;
-    aud.src = `${API}/media?key=${encodeURIComponent(r.audioKey)}`;
+    const audioUrl = `${API}/media?key=${encodeURIComponent(r.audioKey)}`;
+    aud.src = audioUrl;
     card.appendChild(aud);
+
+    const audDl = document.createElement('a');
+    audDl.className = 'media-download-link';
+    audDl.href = audioUrl;
+    audDl.download = `${r.studentName}-audio.mp3`;
+    audDl.textContent = '⬇ Download audio';
+    card.appendChild(audDl);
   }
 
   if(isAdmin()){
@@ -905,6 +1010,7 @@ document.querySelectorAll('input[name="workType"]').forEach(radio=>{
 
 function openLightbox(src){
   document.getElementById('lightbox-img').src = src;
+  document.getElementById('lightbox-download').href = src;
   document.getElementById('lightbox').style.display = 'flex';
 }
 document.getElementById('lightbox').onclick = ()=>{
@@ -914,6 +1020,7 @@ document.getElementById('lightbox-close').onclick = (e)=>{
   e.stopPropagation();
   document.getElementById('lightbox').style.display = 'none';
 };
+document.getElementById('lightbox-download').onclick = (e)=> e.stopPropagation();
 
 /* ---------------- Edit mode ---------------- */
 
@@ -977,6 +1084,116 @@ document.getElementById('cancel-edit-btn').onclick = exitEditMode;
 /* ---------------- Upload / edit form ---------------- */
 
 document.getElementById('search').addEventListener('input', renderEntries);
+
+function loadImageFromFile(file){
+  return new Promise((resolve, reject)=>{
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = ()=>{ resolve({img, url}); };
+    img.onerror = (e)=>{ URL.revokeObjectURL(url); reject(e); };
+    img.src = url;
+  });
+}
+
+// Resizes/re-encodes a photo in the browser before upload. Falls back to the
+// original file untouched if anything goes wrong or it wouldn't help.
+async function compressImage(file){
+  if(!file.type.startsWith('image/') || file.type === 'image/gif') return file;
+  try{
+    const { img, url } = await loadImageFromFile(file);
+    const MAX_DIM = 1920;
+    const scale = Math.min(1, MAX_DIM / Math.max(img.width, img.height));
+    if(scale === 1 && file.size < 1.5 * 1024 * 1024){
+      URL.revokeObjectURL(url);
+      return file; // already small and not oversized — not worth touching
+    }
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(img.width * scale);
+    canvas.height = Math.round(img.height * scale);
+    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+    URL.revokeObjectURL(url);
+    const blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.82));
+    if(blob && blob.size < file.size){
+      return new File([blob], file.name.replace(/\.\w+$/, '') + '.jpg', { type: 'image/jpeg' });
+    }
+    return file;
+  }catch(e){
+    return file; // never block an upload over a failed compression attempt
+  }
+}
+
+// Best-effort video compression for larger clips. Only attempted when the
+// browser supports MediaRecorder + canvas.captureStream; silently falls back
+// to the original file on any error, timeout, or lack of support (which is
+// common on iPhones) so an upload is never blocked by this.
+async function compressVideo(file, onProgress){
+  const THRESHOLD = 20 * 1024 * 1024;
+  if(file.size < THRESHOLD) return file;
+  if(!('MediaRecorder' in window) || !document.createElement('canvas').captureStream) return file;
+
+  return new Promise((resolve)=>{
+    let settled = false;
+    const finish = (result)=>{ if(settled) return; settled = true; cleanup(); resolve(result); };
+
+    const video = document.createElement('video');
+    video.muted = true;
+    video.playsInline = true;
+    const objectUrl = URL.createObjectURL(file);
+    video.src = objectUrl;
+
+    const safetyTimer = setTimeout(()=> finish(file), 4 * 60 * 1000);
+    function cleanup(){ clearTimeout(safetyTimer); URL.revokeObjectURL(objectUrl); }
+
+    video.onerror = ()=> finish(file);
+
+    video.onloadedmetadata = ()=>{
+      if(video.duration > 480 || !video.videoWidth){ finish(file); return; } // skip very long clips
+
+      const MAX_W = 1280;
+      const scale = Math.min(1, MAX_W / video.videoWidth);
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round(video.videoWidth * scale);
+      canvas.height = Math.round(video.videoHeight * scale);
+      const ctx = canvas.getContext('2d');
+
+      const mimeCandidates = ['video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'];
+      const mimeType = mimeCandidates.find(t => window.MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t));
+      if(!mimeType){ finish(file); return; }
+
+      let recorder;
+      try{
+        const stream = canvas.captureStream(30);
+        recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 1_500_000 });
+      }catch(e){ finish(file); return; }
+
+      const chunks = [];
+      recorder.ondataavailable = (e)=>{ if(e.data && e.data.size) chunks.push(e.data); };
+      recorder.onerror = ()=> finish(file);
+      recorder.onstop = ()=>{
+        const blob = new Blob(chunks, { type: mimeType });
+        if(blob.size > 0 && blob.size < file.size){
+          finish(new File([blob], file.name.replace(/\.\w+$/, '') + '.webm', { type: mimeType }));
+        }else{
+          finish(file);
+        }
+      };
+
+      let drawing = true;
+      video.onended = ()=>{ drawing = false; if(recorder.state !== 'inactive') recorder.stop(); };
+      function drawFrame(){
+        if(!drawing) return;
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        if(onProgress && video.duration) onProgress(Math.min(99, Math.round((video.currentTime / video.duration) * 100)));
+        requestAnimationFrame(drawFrame);
+      }
+      video.oncanplay = ()=>{
+        try{ recorder.start(); }catch(e){ finish(file); return; }
+        video.play().catch(()=> finish(file));
+        drawFrame();
+      };
+    };
+  });
+}
 
 async function uploadFile(file, kind, id){
   const res = await fetch(`${API}/upload?kind=${encodeURIComponent(kind)}&id=${encodeURIComponent(id)}`, {
@@ -1051,13 +1268,18 @@ document.getElementById('upload-form').addEventListener('submit', async (e)=>{
   try{
     const newPhotoKeys = [];
     for(let i=0; i<photoFiles.length; i++){
+      submitBtn.textContent = `Compressing photo ${i+1} of ${photoFiles.length}…`;
+      const compressed = await compressImage(photoFiles[i]);
       submitBtn.textContent = `Uploading photo ${i+1} of ${photoFiles.length}…`;
-      newPhotoKeys.push(await uploadFile(photoFiles[i], 'photo', tempId));
+      newPhotoKeys.push(await uploadFile(compressed, 'photo', tempId));
     }
     let newVideoKey = null;
     if(videoFile){
+      const finalVideo = await compressVideo(videoFile, (pct)=>{
+        submitBtn.textContent = `Compressing video… ${pct}%`;
+      });
       submitBtn.textContent = 'Uploading video…';
-      newVideoKey = await uploadFile(videoFile, 'video', tempId);
+      newVideoKey = await uploadFile(finalVideo, 'video', tempId);
     }
     let newAudioKey = null;
     if(audioFile){

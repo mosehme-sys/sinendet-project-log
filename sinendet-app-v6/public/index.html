@@ -77,6 +77,7 @@
   }
   #admin-box .admin-status{font-size:0.78rem; color:#B9C7BE; margin-bottom:8px; line-height:1.4;}
   #admin-box .admin-status b{color:var(--yellow);}
+  .admin-btn-row{display:flex; flex-direction:column; gap:8px;}
   .ghost-btn{
     width:100%; background:transparent; border:1px solid var(--board-lighter); color:#E4EAE6;
     padding:9px 10px; border-radius:8px; font-size:0.82rem; cursor:pointer; transition:all 0.15s ease;
@@ -323,6 +324,27 @@
   #login-modal .modal-actions{display:flex; justify-content:flex-end; gap:10px; margin-top:16px;}
   .text-btn{background:none; border:none; color:var(--ink-soft); font-size:0.85rem; cursor:pointer;}
 
+  /* ---------- Roster modal ---------- */
+  #roster-modal-overlay{display:none; position:fixed; inset:0; background:rgba(20,26,20,0.55); align-items:center; justify-content:center; z-index:70; padding:20px;}
+  #roster-modal{background:#fff; border-radius:14px; padding:28px 26px; width:100%; max-width:480px; max-height:86vh; overflow-y:auto; box-shadow:0 12px 40px rgba(0,0,0,0.25);}
+  #roster-modal h3{font-size:1.15rem; margin-bottom:4px;}
+  #roster-modal p.sub{font-size:0.8rem; color:var(--ink-soft); margin:0 0 18px;}
+  #roster-modal .field{margin-bottom:10px;}
+  #roster-modal textarea{
+    width:100%; font-family:inherit; font-size:0.88rem; padding:10px 12px; border-radius:8px;
+    border:1px solid var(--board-line, #d8ded9); resize:vertical;
+  }
+  #roster-add-error{color:#B03A2E; font-size:0.82rem; margin-top:4px; min-height:1em;}
+  #roster-search{width:100%; margin:8px 0 10px; padding:8px 10px; border-radius:8px; border:1px solid var(--board-line, #d8ded9); font-size:0.85rem;}
+  #roster-list{max-height:220px; overflow-y:auto; border:1px solid var(--board-line, #eceeec); border-radius:8px;}
+  .roster-row{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px 12px; border-bottom:1px solid #f0f1ef; font-size:0.86rem;}
+  .roster-row:last-child{border-bottom:none;}
+  .roster-row .roster-name{font-weight:600; color:var(--ink);}
+  .roster-row .roster-no{color:var(--ink-soft); font-size:0.8rem;}
+  .roster-row .roster-delete{background:none; border:none; color:#B03A2E; cursor:pointer; font-size:0.9rem; padding:2px 6px;}
+  .roster-empty{padding:16px; text-align:center; color:var(--ink-soft); font-size:0.85rem;}
+  #roster-modal .modal-actions{display:flex; justify-content:flex-end; gap:10px; margin-top:16px;}
+
   @media (max-width: 760px){
     body{flex-direction:column;}
     #sidebar{width:100%; height:auto; position:relative; flex-direction:row; align-items:center; justify-content:space-between; padding:10px 14px; gap:10px;}
@@ -335,6 +357,7 @@
       border-top:none; margin-top:0; padding:0; flex-shrink:0; display:flex; align-items:center;
     }
     #admin-box .admin-status{display:none;}
+    #admin-box .admin-btn-row{flex-direction:row;}
     #admin-box .ghost-btn{width:auto; white-space:nowrap; padding:9px 14px; font-size:0.8rem;}
     #main{padding:20px; min-height:auto;}
     #subject-header{align-items:flex-start;}
@@ -366,7 +389,10 @@
   </div>
   <div id="admin-box">
     <div class="admin-status" id="admin-status">Viewing as guest — anyone can upload projects.</div>
-    <button class="ghost-btn" id="admin-toggle-btn">Admin sign in</button>
+    <div class="admin-btn-row">
+      <button class="ghost-btn" id="manage-roster-btn" style="display:none;">Manage students</button>
+      <button class="ghost-btn" id="admin-toggle-btn">Admin sign in</button>
+    </div>
   </div>
 </nav>
 
@@ -427,7 +453,8 @@
       <div class="field-row">
         <div class="field" id="individual-name-field">
           <label for="studentName">Student name <span class="required-star">*</span></label>
-          <input type="text" id="studentName" required placeholder="e.g. Jane Chebet">
+          <input type="text" id="studentName" list="roster-datalist" required placeholder="e.g. Jane Chebet" autocomplete="off">
+          <small id="roster-hint" style="display:none;">Start typing to pick from the student list — assessment no. fills in automatically.</small>
         </div>
         <div class="field" id="group-name-field" style="display:none;">
           <label for="groupLabel">Group name (optional)</label>
@@ -504,8 +531,12 @@
     <span>© <span id="footer-year"></span> Sinendet Mixed Day Senior School — Project Log</span>
     <span class="footer-dot">·</span>
     <span>Powered by Rotich Moses</span>
+    <span class="footer-dot">·</span>
+    <span id="app-version-tag"></span>
   </footer>
 </main>
+
+<datalist id="roster-datalist"></datalist>
 
 <div id="lightbox"><button type="button" id="lightbox-close" aria-label="Close">✕</button><a id="lightbox-download" download title="Download photo">⬇</a><img id="lightbox-img" src="" alt=""></div>
 
@@ -532,6 +563,33 @@
   </div>
 </div>
 
+<div id="roster-modal-overlay">
+  <div id="roster-modal">
+    <div class="modal-icon">🧑‍🎓</div>
+    <h3>Manage student list</h3>
+    <p class="sub">Add learners once here, then every teacher can just pick a name from the dropdown on the upload form and the assessment no. fills in by itself.</p>
+
+    <div class="field">
+      <label for="roster-bulk-input">Add students — one per line, as "Name, Assessment No."</label>
+      <textarea id="roster-bulk-input" rows="4" placeholder="Jane Chebet, 2024/0145&#10;Kiptoo Brian, 2024/0146"></textarea>
+    </div>
+    <div id="roster-add-error"></div>
+    <div class="modal-actions" style="justify-content:flex-start; margin-top:4px;">
+      <button type="button" class="primary" id="roster-add-btn">+ Add to list</button>
+    </div>
+
+    <div class="roster-list-wrap">
+      <label class="tasks-label" style="margin-top:18px; display:block;">Current students (<span id="roster-count">0</span>)</label>
+      <input type="text" id="roster-search" placeholder="Filter by name or assessment no.">
+      <div id="roster-list"></div>
+    </div>
+
+    <div class="modal-actions">
+      <button type="button" class="text-btn" id="roster-close-btn">Close</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const API = '/api';
 
@@ -550,10 +608,13 @@ const SUBJECTS = [
 ];
 
 const MAX_FILE_BYTES = 300 * 1024 * 1024; // 300MB per file — matches the edge function's safe memory ceiling
+const APP_VERSION = '13.0';
 
 let currentSubject = SUBJECTS[0].id;
 let editingRecord = null;   // holds the record currently being edited, or null
 let cachedRows = [];        // last fetched rows for the current subject
+let roster = [];            // admin-managed list of {id, name, assessmentNo}
+let rosterMap = new Map();  // lowercase name -> assessmentNo, for autofill
 
 function getToken(){ return sessionStorage.getItem('adminToken'); }
 function isAdmin(){ return !!getToken(); }
@@ -634,14 +695,139 @@ function showSubjectView(){
 function renderAdminBox(){
   const statusEl = document.getElementById('admin-status');
   const btn = document.getElementById('admin-toggle-btn');
+  const rosterBtn = document.getElementById('manage-roster-btn');
   if(isAdmin()){
     statusEl.innerHTML = `Signed in as <b>${escapeHtml(sessionStorage.getItem('adminUser') || 'admin')}</b>. You can edit and delete entries.`;
     btn.textContent = 'Sign out';
+    rosterBtn.style.display = 'block';
   }else{
     statusEl.textContent = 'Viewing as guest — anyone can upload projects.';
     btn.textContent = 'Admin sign in';
+    rosterBtn.style.display = 'none';
   }
 }
+
+/* ---------------- Student roster (admin-managed, used for autofill) ---------------- */
+
+function buildRosterMap(){
+  return new Map(roster.map(s => [s.name.trim().toLowerCase(), s.assessmentNo]));
+}
+
+async function loadRoster(){
+  try{
+    const res = await fetch(`${API}/roster`);
+    if(!res.ok) return;
+    roster = await res.json();
+    rosterMap = buildRosterMap();
+    renderRosterDatalist();
+    document.getElementById('roster-hint').style.display = roster.length ? 'block' : 'none';
+  }catch{ /* roster is a convenience feature — fail silently */ }
+}
+
+function renderRosterDatalist(){
+  const dl = document.getElementById('roster-datalist');
+  dl.innerHTML = roster.map(s => `<option value="${escapeAttr(s.name)}">`).join('');
+}
+
+function applyRosterAutofill(nameInput, assessInput){
+  const match = rosterMap.get(nameInput.value.trim().toLowerCase());
+  if(match !== undefined && match !== '') assessInput.value = match;
+}
+
+function renderRosterList(){
+  const wrap = document.getElementById('roster-list');
+  const filter = document.getElementById('roster-search').value.trim().toLowerCase();
+  const rows = roster.filter(s =>
+    !filter || s.name.toLowerCase().includes(filter) || (s.assessmentNo || '').toLowerCase().includes(filter)
+  );
+  document.getElementById('roster-count').textContent = roster.length;
+  if(!rows.length){
+    wrap.innerHTML = `<div class="roster-empty">${roster.length ? 'No students match that search.' : 'No students added yet — use the box above to add some.'}</div>`;
+    return;
+  }
+  wrap.innerHTML = rows.map(s => `
+    <div class="roster-row" data-id="${escapeAttr(s.id)}">
+      <div><span class="roster-name">${escapeHtml(s.name)}</span>${s.assessmentNo ? ` <span class="roster-no">· ${escapeHtml(s.assessmentNo)}</span>` : ''}</div>
+      <button type="button" class="roster-delete" title="Remove from list">✕</button>
+    </div>`).join('');
+  wrap.querySelectorAll('.roster-row .roster-delete').forEach(btn=>{
+    btn.onclick = async ()=>{
+      const row = btn.closest('.roster-row');
+      const id = row.dataset.id;
+      btn.disabled = true;
+      try{
+        const res = await fetch(`${API}/roster?id=${encodeURIComponent(id)}`, { method:'DELETE', headers: authHeaders() });
+        if(!res.ok) throw new Error('Could not remove student');
+        roster = await res.json();
+        rosterMap = buildRosterMap();
+        renderRosterDatalist();
+        renderRosterList();
+      }catch(err){
+        alert(err.message);
+        btn.disabled = false;
+      }
+    };
+  });
+}
+
+function openRosterModal(){
+  document.getElementById('roster-bulk-input').value = '';
+  document.getElementById('roster-add-error').textContent = '';
+  document.getElementById('roster-search').value = '';
+  renderRosterList();
+  document.getElementById('roster-modal-overlay').style.display = 'flex';
+}
+
+document.getElementById('manage-roster-btn').onclick = openRosterModal;
+document.getElementById('roster-close-btn').onclick = ()=>{
+  document.getElementById('roster-modal-overlay').style.display = 'none';
+};
+document.getElementById('roster-modal-overlay').addEventListener('click', (e)=>{
+  if(e.target.id === 'roster-modal-overlay') document.getElementById('roster-modal-overlay').style.display = 'none';
+});
+document.getElementById('roster-search').addEventListener('input', renderRosterList);
+
+document.getElementById('roster-add-btn').onclick = async ()=>{
+  const errEl = document.getElementById('roster-add-error');
+  const btn = document.getElementById('roster-add-btn');
+  const raw = document.getElementById('roster-bulk-input').value;
+  errEl.textContent = '';
+
+  const students = raw.split('\n').map(line => {
+    const trimmed = line.trim();
+    if(!trimmed) return null;
+    const [name, ...rest] = trimmed.split(',');
+    return { name: (name || '').trim(), assessmentNo: rest.join(',').trim() };
+  }).filter(s => s && s.name);
+
+  if(!students.length){
+    errEl.textContent = 'Add at least one line with a student name.';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Adding…';
+  try{
+    const res = await fetch(`${API}/roster`, {
+      method: 'POST',
+      headers: authHeaders({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify({ students }),
+    });
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error || 'Could not add students');
+    roster = data;
+    rosterMap = buildRosterMap();
+    renderRosterDatalist();
+    document.getElementById('roster-bulk-input').value = '';
+    document.getElementById('roster-hint').style.display = roster.length ? 'block' : 'none';
+    renderRosterList();
+  }catch(err){
+    errEl.textContent = err.message;
+  }finally{
+    btn.disabled = false;
+    btn.textContent = '+ Add to list';
+  }
+};
 
 function switchSubject(id){
   currentSubject = id;
@@ -961,11 +1147,14 @@ function addMemberRow(name, assessmentNo){
   const row = document.createElement('div');
   row.className = 'task-row member-row';
   row.innerHTML = `
-    <input type="text" class="member-name" placeholder="Learner ${list.children.length + 1} name" value="${escapeAttr(name || '')}">
+    <input type="text" class="member-name" list="roster-datalist" autocomplete="off" placeholder="Learner ${list.children.length + 1} name" value="${escapeAttr(name || '')}">
     <input type="text" class="member-assess" placeholder="Assess. no." value="${escapeAttr(assessmentNo || '')}">
     <button type="button" class="remove-task-btn" title="Remove member">✕</button>
   `;
   row.querySelector('.remove-task-btn').onclick = ()=> row.remove();
+  const nameInput = row.querySelector('.member-name');
+  const assessInput = row.querySelector('.member-assess');
+  nameInput.addEventListener('input', ()=> applyRosterAutofill(nameInput, assessInput));
   list.appendChild(row);
 }
 
@@ -1004,6 +1193,10 @@ function applyWorkTypeUI(){
 
 document.querySelectorAll('input[name="workType"]').forEach(radio=>{
   radio.addEventListener('change', applyWorkTypeUI);
+});
+
+document.getElementById('studentName').addEventListener('input', function(){
+  applyRosterAutofill(this, document.getElementById('assessmentNo'));
 });
 
 /* ---------------- Lightbox ---------------- */
@@ -1576,10 +1769,11 @@ document.getElementById('back-to-home-btn').onclick = showHomeView;
 /* ---------------- Init ---------------- */
 (async function init(){
   document.getElementById('footer-year').textContent = new Date().getFullYear();
+  document.getElementById('app-version-tag').textContent = `v${APP_VERSION}`;
   resetTasksSection();
   resetMembersSection();
   applyWorkTypeUI();
-  await renderHomeTiles();
+  await Promise.all([renderHomeTiles(), loadRoster()]);
 })();
 </script>
 </body>

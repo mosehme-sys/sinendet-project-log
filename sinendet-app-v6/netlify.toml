@@ -15,6 +15,12 @@
   status = 200
   force = true
 
+[[redirects]]
+  from = "/api/roster"
+  to = "/.netlify/functions/roster"
+  status = 200
+  force = true
+
 [[edge_functions]]
   path = "/api/media"
   function = "media"

@@ -608,7 +608,7 @@ const SUBJECTS = [
 ];
 
 const MAX_FILE_BYTES = 300 * 1024 * 1024; // 300MB per file — matches the edge function's safe memory ceiling
-const APP_VERSION = '13.0';
+const APP_VERSION = '13.1';
 
 let currentSubject = SUBJECTS[0].id;
 let editingRecord = null;   // holds the record currently being edited, or null
@@ -724,13 +724,29 @@ async function loadRoster(){
   }catch{ /* roster is a convenience feature — fail silently */ }
 }
 
+function rosterOptionLabel(s){
+  return s.assessmentNo ? `${s.name} — ${s.assessmentNo}` : s.name;
+}
+
 function renderRosterDatalist(){
   const dl = document.getElementById('roster-datalist');
-  dl.innerHTML = roster.map(s => `<option value="${escapeAttr(s.name)}">`).join('');
+  // Each option shows "Full Name — Assessment No." in the dropdown so teachers
+  // can tell students apart at a glance; picking one is parsed back apart below.
+  dl.innerHTML = roster.map(s => `<option value="${escapeAttr(rosterOptionLabel(s))}">`).join('');
 }
 
 function applyRosterAutofill(nameInput, assessInput){
-  const match = rosterMap.get(nameInput.value.trim().toLowerCase());
+  const raw = nameInput.value;
+  // Selected straight from the dropdown: "Full Name — Assessment No." — split
+  // it back into the two fields so the name box only ever holds the name.
+  const combined = raw.match(/^(.*?)\s+—\s+(.+)$/);
+  if(combined){
+    nameInput.value = combined[1].trim();
+    assessInput.value = combined[2].trim();
+    return;
+  }
+  // Typed the name out manually (no dash) — still autofill if it matches exactly.
+  const match = rosterMap.get(raw.trim().toLowerCase());
   if(match !== undefined && match !== '') assessInput.value = match;
 }
 
